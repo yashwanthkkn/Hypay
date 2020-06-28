@@ -44,7 +44,7 @@ app.use(express.static('public'));
 // }); 
 
 
-mongoose.connect('mongodb+srv://<username>:<password>@cluster0-f0akj.mongodb.net/HypayDb?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://user:a8LwrJEsdShxeS9c@cluster0-f0akj.mongodb.net/HypayDb?retryWrites=true&w=majority', {
 	
   useNewUrlParser: true,
   useUnifiedTopology: true,
