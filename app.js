@@ -299,6 +299,6 @@ app.post("/deleteBus",(req,res)=>{
 	});
 })
 // LISTENING PORT
-app.listen(3000,function(){
+app.listen(process.env.PORT || 3000,function(){
 	console.log("HyPaY Server started");
 });
