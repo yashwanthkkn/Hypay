@@ -24,7 +24,8 @@
 	</nav>
 	<div class="container">
 		<h2 class="text-dark">Update a Bus to the database</h2>
-		<form method="POST" action="/addBus" onsubmit="return validateform()" name="addBus">
+		<h4 class="text-danger"><%= flag%></h4>
+		<form method="POST" action="/updateBus" onsubmit="return validateform()" name="addBus">
 				<div class="form-group ">
 					<label for="number" class="text-primary font-weight-bold">Bus Number :</label>
 					<input type="text" id="number" name="number" placeholder="Number" class="form-control" >

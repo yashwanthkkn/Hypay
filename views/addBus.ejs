@@ -8,13 +8,13 @@
 	  <div class="collapse navbar-collapse" id="navbarNav">
 		<ul class="navbar-nav">
 		  <li class="nav-item active">
-			<a class="nav-link" href="#">Add<span class="sr-only">(current)</span></a>
+			<a class="nav-link" href="/addBus">Add<span class="sr-only">(current)</span></a>
 		  </li>
 		  <li class="nav-item">
-			<a class="nav-link" href="#">Update</a>
+			<a class="nav-link" href="/updateBus">Update</a>
 		  </li>
 		  <li class="nav-item">
-			<a class="nav-link" href="#">Delete</a>
+			<a class="nav-link" href="/deleteBus">Delete</a>
 		  </li> 
 		  <li class="nav-item">
 			<a class="nav-link" href="/logout">Logout</a>
@@ -24,6 +24,7 @@
 	</nav>
 	<div class="container">
 		<h2 class="text-dark">Add Bus to the database</h2>
+		<h4 class="text-danger"><%= flag%></h4>
 		<form method="POST" action="/addBus" onsubmit="return validateform()" name="addBus">
 				<div class="form-group ">
 					<label for="number" class="text-primary font-weight-bold">Bus Number :</label>

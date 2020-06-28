@@ -58,20 +58,6 @@ function displayUsers(){
 
 }
 
-// FUNCTION TO ADD A NEW USER
-function addUser(formResult){
-
-	User.create(formResult,function(err,res){
-		if(err){
-			console.log("messed up");
-		}else{
-			console.log("added successfully");
-			displayUsers();
-		}
-	});	
-
-}
-
 // SETTING UP THE VIEW ENGINE
 app.set("view engine","ejs");
 
@@ -202,17 +188,17 @@ app.get("/logout",(req,res)=>{
 // *************
 
 app.get("/addBus",(req,res)=>{
-	res.render("addBus");
+	res.render("addBus",{flag:""});
 })
 
 
 app.get("/updateBus",(req,res)=>{
-	res.render("updateBus");
+	res.render("updateBus",{flag:""});
 })
 
 
-app.get("/removeBus",(req,res)=>{
-	res.render("removeBus");
+app.get("/deleteBus",(req,res)=>{
+	res.render("deleteBus",{flag:""});
 })
 
 app.post("/addBus",(req,res)=>{
@@ -227,12 +213,61 @@ app.post("/addBus",(req,res)=>{
 		totime:req.body.totime,
 		price:req.body.price
 	});
-	bus.save((err,bus)=>{
+	Bus.findOne({number:req.body.number},(err,user)=>{
+		if(err){
+			console.log(err)
+		}else if(user == null){
+			bus.save((err,bus)=>{
+				if(err){
+					console.log(err);
+				}
+				else{
+					res.render("addBus",{flag:"Added to db"});
+				}
+			});
+		}else{
+			res.render("addBus",{flag:"Bus already exists"});
+		}
+	})
+	
+})
+
+app.post("/updateBus",(req,res)=>{
+	Bus.findOne({number:req.body.number},(err,user)=>{
+		if(err){
+			console.log(err)
+		}else if(user == null){
+			res.render("updateBus",{flag:"No such Bus found"});
+		}else{
+			console.log(user);
+			user.number=req.body.number;
+			user.seats=req.body.seats;
+			user.travel_id=req.body.travel_id;
+			user.from=req.body.from;
+			user.to=req.body.to;
+			user.available=req.body.seats;
+			user.ftime=req.body.ftime;
+			user.totime=req.body.totime;
+			user.price=req.body.price;
+			console.log(user);
+			user.save();
+			res.render("updateBus",{flag:"Successfully updated"});
+		}
+	})
+})
+
+app.post("/deleteBus",(req,res)=>{
+	console.log(req.body);
+	Bus.deleteOne({number:req.body.bid},(err,bus)=>{
 		if(err){
 			console.log(err);
-		}
-		else{
-			res.send("Recorded..");
+		}else{
+			console.log(bus.n);
+			if(bus.n == 0 ){
+				res.render("deleteBus",{flag:"Bus not found"})
+			}else{
+				res.render("deleteBus",{flag:"Successfully deleted"})
+			}
 		}
 	});
 })
