@@ -1,0 +1,72 @@
+<%- include("partials/header"); %>
+<div class="container mt-2 px-2">
+	<div class="row ">
+		<div class="col-lg-2">
+		</div>
+		<div class="col-lg-8 border rounded-sm border-primary pb-2 pt-2">
+			<div class="text-center text-primary pb-3 my-2">
+				<h1><strong class="border border-primary rounded-pill px-2 py-1">HypaY</strong></h1>
+			</div>
+
+			<form method="POST" action="/register" onsubmit="return validateform()" name="signup">
+				<div class="form-group ">
+					<label for="uname" class="text-primary font-weight-bold">Name :</label>
+					<input type="text" id="uname" name="uname" placeholder="User name" class="form-control" >
+					<span id="unameloc" class="text-danger"></span>
+				</div>
+				<div class="form-group ">
+					<label for="username" class="text-primary font-weight-bold">Number :</label>
+					<input type="text" id="username" name="username" placeholder="Mobile no" class="form-control">
+					<span id="usernameloc" class="text-danger"></span>
+				</div>
+				<div class="form-group ">
+					<label for="upass" class="text-primary font-weight-bold">Password :</label>
+					<input type="password" id="upass" name="password" placeholder="Password" class="form-control">
+					<span id="upassloc" class="text-danger"></span>
+				</div>
+				<div class="text-center">
+					<button type="submit" class="btn btn-lg btn-primary rounded-pill" >Sign up</button>
+					<p></p>
+					<% if(exists == true){%>
+						<p>Moblie number exists...try another</p>
+					<% } %>
+				</div>
+			</form>
+			<form method="GET" action="/login">
+				<p></p>
+				<div class="text-center">
+					Already have an account..?
+					<input type="submit" value="Login" class="btn btn-link ">
+				</div>
+			</form>
+		</div>
+		<div class="col-lg-2">
+		</div>
+	</div>
+</div>
+<script>  
+function validateform(){  
+var uname=document.signup.uname.value;
+var username=document.signup.username.value;    
+var password=document.signup.upass.value;  
+  
+if (uname==null || uname==""){  
+  document.getElementById("unameloc").innerHTML="Name can't be blank";   
+  return false;  
+}else if(username==null || username==""){
+  document.getElementById("unameloc").innerHTML="";	
+  document.getElementById("usernameloc").innerHTML="Number can't be blank";   
+  return false;  
+}else if(username.length<10){
+  document.getElementById("unameloc").innerHTML="";
+  document.getElementById("usernameloc").innerHTML="Invalid Number";   
+  return false;  
+}
+	else if(password.length<6){  
+	document.getElementById("usernameloc").innerHTML="";
+  document.getElementById("upassloc").innerHTML="Password Field Needs atleast 6 characters";
+  return false;  
+  }  
+}
+</script>
+<%- include("partials/footer"); %>

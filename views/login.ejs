@@ -1,0 +1,42 @@
+<%- include("partials/header"); %>
+
+<div class="container  mt-2 px-1 ">
+	<div class="row ">
+		<div class="col-lg-2">
+		</div>
+		<div class="col-lg-8 border rounded-sm border-primary pb-2 pt-2">	
+			<div class="text-center text-primary pb-3 mt-2">
+				<h1 ><strong class="border border-primary rounded-pill px-2 py-1">HypaY</strong></h1>
+			</div>
+			<form method="POST" action="/login">
+				<div class="form-group">
+					<label for="username" class="text-primary font-weight-bold">Mobile Number :</label>
+					<input id="username" name="username" type="text" placeholder="Number" class="form-control">
+				</div>
+				<div class="form-group">
+					<label for="password" class="text-primary font-weight-bold">Password :</label>
+					<input id="password" name="password" type="password" placeholder="Password" class="form-control">
+				</div>
+				<p></p>
+				<div class="text-center">
+					<button type="submit" class="btn btn-lg btn-primary rounded-pill" >Login</button>
+				</div>
+				<p></p>
+				<% if(check == true){%>
+						<p>Incorrect username or password</p>
+				<% } %>
+			</form>
+
+			<form method="GET" action="/signup">
+				<p></p>
+				<div class="text-center">
+					Dont have a account..?
+					<input type="submit" value="Sign up" class="btn btn-link ">
+				</div>
+			</form>
+		</div>
+		<div class="col-lg-2">
+		</div>
+	</div>
+</div>
+<%- include("partials/footer"); %>

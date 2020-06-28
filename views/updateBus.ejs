@@ -1,0 +1,107 @@
+<%- include("partials/header"); %>
+<div >
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="#"><strong>Hypay</strong></a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+		  <li class="nav-item active">
+			<a class="nav-link" href="/addBus">Add<span class="sr-only">(current)</span></a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/updateBus">Update</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/deleteBus">Delete</a>
+		  </li> 
+		  <li class="nav-item">
+			<a class="nav-link" href="/logout">Logout</a>
+		  </li>
+		</ul>
+	  </div>
+	</nav>
+	<div class="container">
+		<h2 class="text-dark">Update a Bus to the database</h2>
+		<form method="POST" action="/addBus" onsubmit="return validateform()" name="addBus">
+				<div class="form-group ">
+					<label for="number" class="text-primary font-weight-bold">Bus Number :</label>
+					<input type="text" id="number" name="number" placeholder="Number" class="form-control" >
+					<span id="numberloc" class="text-danger"></span>
+				</div>
+				<div class="form-group ">
+					<label for="seats" class="text-primary font-weight-bold">Seats :</label>
+					<input type="text" id="seats" name="seats" placeholder="No. of seats" class="form-control">
+					<span id="seatloc" class="text-danger"></span>
+				</div>
+				<div class="form-group ">
+					<label for="travel_id" class="text-primary font-weight-bold">Travel id :</label>
+					<input type="text" id="travel_id" name="travel_id" placeholder="Travel id" class="form-control">
+					<span id="travel_idloc" class="text-danger"></span>
+				</div>
+				<div class="form-group ">
+					<label for="from" class="text-primary font-weight-bold">From :</label>
+					<input type="text" id="from" name="from" placeholder="Eg. Chennai" class="form-control">
+					<span id="fromloc" class="text-danger"></span>
+				</div>
+				<div class="form-group ">
+					<label for="ftime" class="text-primary font-weight-bold">From time :</label>
+					<input type="text" id="ftime" name="ftime" placeholder="Eg: 10 am" class="form-control">
+					<span id="ftimeloc" class="text-danger"></span>
+				</div>
+				<div class="form-group ">
+					<label for="To" class="text-primary font-weight-bold">To :</label>
+					<input type="text" id="to" name="to" placeholder="Eg. Tirupur" class="form-control">
+					<span id="toloc" class="text-danger"></span>
+				</div>
+				<div class="form-group ">
+					<label for="totime" class="text-primary font-weight-bold">To time:</label>
+					<input type="text" id="totime" name="totime" placeholder="Eg 10 pm" class="form-control">
+					<span id="totimeloc" class="text-danger"></span>
+				</div>
+				<div class="form-group ">
+					<label for="price" class="text-primary font-weight-bold">Price per ticket :</label>
+					<input type="text" id="price" name="price" placeholder="Eg. 320" class="form-control">
+					<span id="priceloc" class="text-danger"></span>
+				</div>
+				<div class="text-center">
+					<button type="submit" class="btn btn-lg btn-primary rounded-pill" >Submit</button>
+					<p></p>
+				</div>
+			</form>
+	</div>
+	
+<script>
+	function validateform(){  
+var number=document.addBus.number.value;
+var seats=document.addBus.seats.value;    
+var travel_id=document.addBus.tavel_id.value;
+var from =document.addBus.from.value;
+var to =document.addBus.to.value;
+  
+if (number==null || number==""){  
+  document.getElementById("numberloc").innerHTML="can't be blank";   
+  return false;  
+}else if(seats==null || seats==""){
+  document.getElementById("numberloc").innerHTML="";	
+  document.getElementById("seatsloc").innerHTML="can't be blank";   
+  return false;  
+}else if(travel_id==null || travel_id==""){
+  document.getElementById("seatsloc").innerHTML="";	
+  document.getElementById("travel_idloc").innerHTML="can't be blank";   
+  return false;  
+}else if(from==null || from==""){
+  document.getElementById("travel_idloc").innerHTML="";	
+  document.getElementById("fromloc").innerHTML="can't be blank";   
+  return false;  
+}else if(to ==null || to ==""){
+  document.getElementById("fromloc").innerHTML="";	
+  document.getElementById("toloc").innerHTML="can't be blank";   
+  return false;  
+}
+
+}
+
+</script>
+<%- include("partials/footer"); %>

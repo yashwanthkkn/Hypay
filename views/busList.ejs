@@ -1,0 +1,44 @@
+<%- include("partials/header"); %>
+<div>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="#"><strong>Hypay</strong></a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+		  <li class="nav-item active">
+			<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#">About</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="#">Pricing</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/logout">Logout</a>
+		  </li>
+		</ul>
+	  </div>
+	</nav>
+	<div class="container">
+		<h2 class="text-dark">Bus List</h2><span name="<%= User.ud %>" id="ud"></span>
+		<% Buses.forEach((x)=>{ %>
+			<div class="card">
+			  <h5 class="card-header">Bus Number :<%= x.number %> </h5>
+			  <div class="card-body">
+				  <h5 class="card-title">Travel : <strong> <%= x.from %> </strong> to <strong> <%= x.to %></strong></h5>
+				  <p class="card-text">Time : <strong> <%= x.ftime %> </strong> to <strong><%= x.totime %></strong></p>
+				  <p class="card-text">Available Seats : <strong><%= x.available %></strong> </p>
+				<p class="card-text">Price : 120 </p>
+				  <form method="POST" action="/getBill/<%= User.ud%>/<%= x.number%>">
+				<button type="submit" class="btn btn-danger btn-lg rounded-pill" value="<%= x.number %>"> Book </button>
+				</form>
+			  </div>
+			</div>	
+		<% }); %>
+	</div>
+	<script>
+	</script>
+<%- include("partials/footer"); %>
