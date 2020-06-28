@@ -31,7 +31,7 @@
 				  <h5 class="card-title">Travel : <strong> <%= x.from %> </strong> to <strong> <%= x.to %></strong></h5>
 				  <p class="card-text">Time : <strong> <%= x.ftime %> </strong> to <strong><%= x.totime %></strong></p>
 				  <p class="card-text">Available Seats : <strong><%= x.available %></strong> </p>
-				<p class="card-text">Price : 120 </p>
+				<p class="card-text">Price : <strong><%= x.price %></strong> </p>
 				  <form method="POST" action="/getBill/<%= User.ud%>/<%= x.number%>">
 				<button type="submit" class="btn btn-danger btn-lg rounded-pill" value="<%= x.number %>"> Book </button>
 				</form>

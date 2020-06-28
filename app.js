@@ -34,7 +34,17 @@ app.use(express.static('public'));
 
 
 // CONNECTING THE DATABASE TO THE SERVER
-mongoose.connect('mongodb://localhost/HypayDb', {
+// mongoose.connect('mongodb://localhost/HypayDb', {
+	
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   useFindAndModify: false,
+//   useCreateIndex:true
+
+// }); 
+
+
+mongoose.connect('mongodb+srv://<username>:<password>@cluster0-f0akj.mongodb.net/HypayDb?retryWrites=true&w=majority', {
 	
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -42,8 +52,6 @@ mongoose.connect('mongodb://localhost/HypayDb', {
   useCreateIndex:true
 
 });
-
-
 
 // FUNCTION TO DISPALY THE ENTIRE DB
 function displayUsers(){
@@ -141,7 +149,7 @@ app.post("/register",function(req,res){
 			passport.authenticate('local')(req,res,function(){
 				if(req.user){
 					if(req.body.username == 'admin12345'){
-						res.redirect("/addBus/specialAccess");
+						res.redirect("/addBus");
 					}else{
 						res.redirect("/logged");	
 					}
@@ -156,7 +164,7 @@ app.post("/register",function(req,res){
 // BOOK ROUTES
 // *************
 
-app.post("/bookBus/:id",(req,res)=>{
+app.post("/bookBus/:id",isLoggedIn,(req,res)=>{
 	var User = {ud:req.params.id};
 	var selector = req.body.pickup+req.body.drop;
 	Bus.find({travel_id:selector},(err,buses)=>{
@@ -168,11 +176,30 @@ app.post("/bookBus/:id",(req,res)=>{
 	});
 });
 
-app.post("/getBill/:uid/:bid",(req,res)=>{
+app.post("/getBill/:uid/:bid",isLoggedIn,(req,res)=>{
 	console.log(req.params);
-	res.render("billing");
+	User.findById(req.params.uid,(err,user)=>{
+		if(err){
+			console.log(err)
+		}else{
+			Bus.findOne({number:req.params.bid},(err,bus)=>{
+				if(err){
+					console.log(err);
+				}else{
+					res.render("billing",{User:user,Bus:bus});
+				}
+			})
+		}
+	})
 	
 })
+
+app.post("/paymentGateway/:uid/:bid",isLoggedIn,(req,res)=>{
+	console.log(req.params);
+	console.log(req.body);
+	res.render("paymentGateway");
+})
+
 // *************
 // LOGOUT ROUTES
 // *************
@@ -187,17 +214,17 @@ app.get("/logout",(req,res)=>{
 // Add Bus to Db
 // *************
 
-app.get("/addBus",(req,res)=>{
+app.get("/addBus",isLoggedIn,(req,res)=>{
 	res.render("addBus",{flag:""});
 })
 
 
-app.get("/updateBus",(req,res)=>{
+app.get("/updateBus",isLoggedIn,(req,res)=>{
 	res.render("updateBus",{flag:""});
 })
 
 
-app.get("/deleteBus",(req,res)=>{
+app.get("/deleteBus",isLoggedIn,(req,res)=>{
 	res.render("deleteBus",{flag:""});
 })
 
