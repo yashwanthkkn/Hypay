@@ -1,0 +1,61 @@
+<%- include("partials/header"); %>
+<div >
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="#"><i class="fab fa-galactic-senate"></i><strong class="pl-2">Hypay</strong></a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+		  <li class="nav-item active">
+			<a class="nav-link" href="/addBus">Add<span class="sr-only">(current)</span></a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/updateBus">Update</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/deleteBus">Delete</a>
+		  </li> 
+		  <li class="nav-item">
+			<a class="nav-link" href="/logout">Logout</a>
+		  </li>
+		</ul>
+	  </div>
+	</nav>
+	<div class="container">
+		<h2 class="text-dark">Delete a Bus </h2>
+		<span class="text-danger"><%= flag%></span>
+		<form method="POST" action="/deleteBus" id="deleteForm "onsubmit="return validateForm()">
+		  <div class="form-group">
+			<label for="bid">Enter Bus Number:</label>
+			<input type="text" class="form-control" id="bid" name="bid" placeholder="Bus Number">
+			<small id="emailHelp" class="form-text text-muted">Once deleted ,Cannot be retrived.</small>
+			  <span id="inputloc" class="text-danger"></span>
+		  </div>
+		  <div class="form-check">
+			<input type="checkbox" class="form-check-input" id="confirmCheck" value="true">
+			<label class="form-check-label" for="confirmCheck" >Yes,I want to delete</label>
+		  </div>
+			<p></p>
+		  <button type="submit" id="deletebtn" class="btn btn-danger btn-lg rounded-pill d-none">Delete</button>
+		</form>
+	</div>
+	<script>
+		var btn = document.getElementById("deletebtn");
+		var x = document.getElementById("confirmCheck");
+		x.onchange = ()=>{
+			if(x.checked){
+				btn.classList.remove("d-none");
+			}else{
+				btn.classList.add("d-none");
+			}
+		};
+		function validateForm(){
+				var bid = document.getElementById("bid");
+				if(bid.value==null || bid.value ==""){
+					document.getElementById("inputloc").innerHTML="Field cannot be empty";
+					return false;
+				}
+		}
+	</script>
+<%- include("partials/footer"); %>
