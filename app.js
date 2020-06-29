@@ -7,7 +7,8 @@ var express               = require("express"),
     passportLocalMongoose = require("passport-local-mongoose"),
     User                  = require("./models/user"),     
 	Bus                  = require("./models/bus"); 
-
+const checksum_lib = require("./paytm/lib/checksum");
+const port = 3000; 
 
 var app = express();
 var check = false;
@@ -138,7 +139,7 @@ app.get("/signup",function(req,res){
 
 
 app.post("/register",function(req,res){
-	User.register(new User({uname:req.body.uname,username:req.body.username}),req.body.password,function(err,user){
+	User.register(new User({uname:req.body.uname,orders:0,username:req.body.username}),req.body.password,function(err,user){
 		if(err){
 			if(err.name === "UserExistsError"){
 				res.render("signup",{exists:true});
@@ -202,11 +203,6 @@ app.post("/getBill/:uid/:bid",isLoggedIn,(req,res)=>{
 	
 })
 
-app.post("/paymentGateway/:uid/:bid",isLoggedIn,(req,res)=>{
-	console.log(req.params);
-	console.log(req.body);
-	res.render("paymentGateway");
-})
 
 // *************
 // LOGOUT ROUTES
@@ -292,7 +288,6 @@ app.post("/updateBus",(req,res)=>{
 })
 
 app.post("/deleteBus",(req,res)=>{
-	console.log(req.body);
 	Bus.deleteOne({number:req.body.bid},(err,bus)=>{
 		if(err){
 			console.log(err);
@@ -306,6 +301,97 @@ app.post("/deleteBus",(req,res)=>{
 		}
 	});
 })
+
+// *************
+// Payment gateway
+// // *************
+
+app.post("/paymentGateway/:uid/:bid",(req,res)=>{
+	User.findById(req.params.uid,(err,user)=>{
+		if(err){
+			console.log(err);
+		}else{
+			Bus.findOne({number:req.params.bid},(err,bus)=>{
+				if(err){
+					console.log(err);
+				}else{
+					if(user.orders == undefined){
+						user.orders = 0;
+						user.save();
+					}
+					var orders = user.orders;
+					orders++;
+					let params = {}
+					params['MID'] = "WAMbVz76726588946815",
+					params['WEBSITE'] = "WESTAGING",
+					params['CHANNEL_ID'] = 'WEB',
+					params['INDUSTRY_TYPE_ID'] = 'Retail',
+					params['ORDER_ID'] = 'ORD'+user.id+orders,
+					params["CUST_ID"] = "CUST"+user.id,
+					params['TXN_AMOUNT'] = req.body.netcost,
+					params["CALLBACK_URL"] = "http://localhost:"+port+"/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
+					params["EMAIL"] = 'xyz@gmail.com',
+					params["MOBILE_NO"] = user.username
+				
+					checksum_lib.genchecksum(params,"jBP8D58qRBMqBj&t",(err,checksum)=>{
+						let txn_url = "https://securegw-stage.paytm.in/order/process"
+				
+						let form_fields = ""
+				
+						for(x in params){
+							form_fields += "<input type='hidden' name='"+x+"' value='"+params[x]+"'/>"
+						}
+				
+						form_fields += "<input type='hidden' name='CHECKSUMHASH' value='"+checksum+"'>"
+				
+						var html = '<html><body><center><h1>Please wait ..Do not refresh this page</h1></center><form method="POST" action="'+txn_url+'" name="f1">'+form_fields+'</form><script type="text/javascript">document.f1.submit()</script></body></html>'
+						res.writeHead(200,{'Content-Type':"text/html"})
+						res.write(html)
+						res.end()
+					})
+				}
+			})
+		}
+	})
+
+})
+
+app.post("/callback/:uid/:bid/:seats",(req,res)=>{
+	if(req.body.STATUS == 'TXN_SUCCESS'){
+		User.findById(req.params.uid,(err,user)=>{
+			if(err){
+				console.log(err);
+			}
+			user.orders++;
+			req.body.bus = req.params.bid;
+			req.body.seats = req.params.seats;
+			user.txns.push(req.body);
+			user.save();
+			Bus.findOne({number:req.params.bid},(err,bus)=>{
+				if(err){
+					console.log(err);
+				}else{
+					bus.available--;
+					bus.save();
+					res.render("transSuccess",{tid:req.body.TXNID,oid:req.body.ORDERID,amt:req.body.TXNAMOUNT,tdate:req.body.TXNDATE});
+				}					
+			})
+		})
+		
+	}else{
+		User.findById(req.params.uid,(err,user)=>{
+			if(err){
+				console.log(err);
+			}else{
+				user.orders+=1;
+				user.save();
+			}
+		})
+		res.render("transFail",{res:req.body.RESPMSG});
+	}
+
+})
+
 // LISTENING PORT
 app.listen(process.env.PORT || 3000,function(){
 	console.log("HyPaY Server started");
