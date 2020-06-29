@@ -329,7 +329,7 @@ app.post("/paymentGateway/:uid/:bid",(req,res)=>{
 					params['ORDER_ID'] = 'ORD'+user.id+orders,
 					params["CUST_ID"] = "CUST"+user.id,
 					params['TXN_AMOUNT'] = req.body.netcost,
-					params["CALLBACK_URL"] = "http://localhost:"+process.env.PORT+"/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
+					params["CALLBACK_URL"] = "hypay.herokuapp.com/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
 					params["EMAIL"] = 'xyz@gmail.com',
 					params["MOBILE_NO"] = user.username
 				
