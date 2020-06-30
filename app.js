@@ -6,7 +6,8 @@ var express               = require("express"),
     LocalStrategy         = require("passport-local"),
     passportLocalMongoose = require("passport-local-mongoose"),
     User                  = require("./models/user"),     
-	Bus                  = require("./models/bus"); 
+	Bus                  = require("./models/bus"),
+	QRCode = require('qrcode');
 const checksum_lib = require("./paytm/lib/checksum");
 const port = 3000; 
 
@@ -389,6 +390,10 @@ app.post("/callback/:uid/:bid/:seats",(req,res)=>{
 				req.body.to = bus.to;
 				req.body.ftime = bus.ftime;
 				req.body.totime = bus.totime;
+				var qrtext = user.username+bus.number+req.params.seats+req.body.TXNDATE;
+				QRCode.toDataURL(qrtext, function (err, url) {
+					req.body.qr64 = url;
+				})
 				user.txns.push(req.body);
 				user.save();
 				if(err){

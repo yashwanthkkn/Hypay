@@ -22,7 +22,7 @@
     <div class="container mt-3">
         <% var n = 0%>
         <% User.txns.forEach((x)=>{ %>
-            <div class="card mt-2 pb-2">
+            <div class="card mt-2 ">
                 <div class="card-body">
                   <h5 class="card-title">Trip - <%= ++n %></h5>
                   <hr>
@@ -34,8 +34,14 @@
                   <li class="list-group-item">Time :<strong> <%= x.ftime %></strong> to <strong> <%= x.totime %></strong></li>
                 </ul>
                 <div class="card-body">
-                  <a href="#" class="card-link">Generate QR</a>
-                  <a href="#" class="card-link">Another link</a>
+                  <!-- <a href="#" class="card-link">Generate QR</a>
+                  <a href="#" class="card-link">Another link</a>     -->
+                  <%if(x.qr64){%> 
+                      <div class="text-center">
+                      <h5>Made Your Scan QRCode For Trip - <%= n%></h5>
+                      <img src="<%=x.qr64%>" alt="" style="width:200px; height:200px;">
+                      </div>
+                  <%}%>
                 </div>
               </div>
       <%  }) %>
