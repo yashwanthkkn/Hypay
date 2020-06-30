@@ -21,11 +21,12 @@
 	</nav>
 	<div class="container mt-2">
 		<h2 class="text-dark">Hello, <%= User.uname.toUpperCase() %></h2>
-		<h5>Here to book a Ride..? Just click Book</h5>
 		<div class="container mt-4">
 			<div class="text-center">
-				<!-- <button type="button" class="btn btn-warning btn-lg rounded-pill mt-2">My Profile</button>
-				<p></p> -->
+				<form method="POST" action="mytrips/<%=User.ud%>">
+					<button type="submit" class="btn btn-warning btn-lg rounded-pill mt-2">My Trips</button>
+				</form>
+				<p></p>
 				<p></p>
 				<button type="button" class="btn btn-danger btn-lg rounded-pill mt-2" onclick="displayDiv()">Book a Ride</button>
 				<div  class="d-none" id="PathDev">

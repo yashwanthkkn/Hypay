@@ -45,7 +45,7 @@ app.use(express.static('public'));
 // }); 
 
 
-mongoose.connect('mongodb+srv://user:KKLHtOVg8wdFdSG3@cluster0-f0akj.mongodb.net/HypayDb?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://user:zJzOg1YGHJw9CP5R@cluster0-f0akj.mongodb.net/HypayDb?retryWrites=true&w=majority', {
 	
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -162,10 +162,30 @@ app.post("/register",function(req,res){
 });
 
 // *************
+// MY Trips ROUTE
+// *************
+
+app.post("/mytrips/:uid",isLoggedIn,(req,res)=>{
+	User.findById(req.params.uid,(err,user)=>{
+		if(err){
+			console.log(err);
+		}
+		else{
+			if(user.txns.length == 0){
+				res.render("mytripsemt");
+			}else{
+				res.render("mytrips",{User:user});
+			}
+		}
+	})
+})
+
+// *************
 // ABOUT ROUTE
 // *************
 
 app.get("/about",(req,res)=>{
+	
 	res.render("about");
 })
 
@@ -186,7 +206,6 @@ app.post("/bookBus/:id",isLoggedIn,(req,res)=>{
 });
 
 app.post("/getBill/:uid/:bid",isLoggedIn,(req,res)=>{
-	console.log(req.params);
 	User.findById(req.params.uid,(err,user)=>{
 		if(err){
 			console.log(err)
@@ -270,7 +289,6 @@ app.post("/updateBus",(req,res)=>{
 		}else if(user == null){
 			res.render("updateBus",{flag:"No such Bus found"});
 		}else{
-			console.log(user);
 			user.number=req.body.number;
 			user.seats=req.body.seats;
 			user.travel_id=req.body.travel_id;
@@ -329,7 +347,8 @@ app.post("/paymentGateway/:uid/:bid",(req,res)=>{
 					params['ORDER_ID'] = 'ORD'+user.id+orders,
 					params["CUST_ID"] = "CUST"+user.id,
 					params['TXN_AMOUNT'] = req.body.netcost,
-					params["CALLBACK_URL"] = "https://hypay.herokuapp.com/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
+					// params["CALLBACK_URL"] = "https://hypay.herokuapp.com/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
+					params["CALLBACK_URL"] = "http://localhost:3000/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
 					params["EMAIL"] = 'xyz@gmail.com',
 					params["MOBILE_NO"] = user.username
 				
@@ -362,12 +381,16 @@ app.post("/callback/:uid/:bid/:seats",(req,res)=>{
 			if(err){
 				console.log(err);
 			}
-			user.orders++;
-			req.body.bus = req.params.bid;
-			req.body.seats = req.params.seats;
-			user.txns.push(req.body);
-			user.save();
-			Bus.findOne({number:req.params.bid},(err,bus)=>{
+			Bus.findOne({number:req.params.bid},(err,bus)=>{		
+				user.orders++;
+				req.body.bus = req.params.bid;
+				req.body.seats = req.params.seats;
+				req.body.from = bus.from;
+				req.body.to = bus.to;
+				req.body.ftime = bus.ftime;
+				req.body.totime = bus.totime;
+				user.txns.push(req.body);
+				user.save();
 				if(err){
 					console.log(err);
 				}else{
