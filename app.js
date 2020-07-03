@@ -46,7 +46,7 @@ app.use(express.static('public'));
 // }); 
 
 
-mongoose.connect('mongodb+srv://user:zJzOg1YGHJw9CP5R@cluster0-f0akj.mongodb.net/HypayDb?retryWrites=true&w=majority', {
+mongoose.connect('mongodb+srv://user:nN6JAsww5cMup1Ai@cluster0-f0akj.mongodb.net/HypayDb?retryWrites=true&w=majority', {
 	
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -336,10 +336,12 @@ app.post("/paymentGateway/:uid/:bid",(req,res)=>{
 				}else{
 					if(user.orders == undefined){
 						user.orders = 0;
-						user.save();
+						
 					}
 					var orders = user.orders;
 					orders++;
+					user.orders++;
+					user.save();
 					let params = {}
 					params['MID'] = "WAMbVz76726588946815",
 					params['WEBSITE'] = "WESTAGING",
@@ -383,7 +385,6 @@ app.post("/callback/:uid/:bid/:seats",(req,res)=>{
 				console.log(err);
 			}
 			Bus.findOne({number:req.params.bid},(err,bus)=>{		
-				user.orders++;
 				req.body.bus = req.params.bid;
 				req.body.seats = req.params.seats;
 				req.body.from = bus.from;
@@ -407,19 +408,15 @@ app.post("/callback/:uid/:bid/:seats",(req,res)=>{
 		})
 		
 	}else{
-		User.findById(req.params.uid,(err,user)=>{
-			if(err){
-				console.log(err);
-			}else{
-				user.orders+=1;
-				user.save();
-			}
-		})
 		res.render("transFail",{res:req.body.RESPMSG});
 	}
 
 })
 
+
+app.get("/scanQR",(req,res)=>{
+	res.render("codeScanner");
+})
 // LISTENING PORT
 app.listen(process.env.PORT || 3000,function(){
 	console.log("HyPaY Server started");
