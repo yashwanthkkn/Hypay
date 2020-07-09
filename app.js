@@ -396,7 +396,7 @@ app.post("/callback/:uid/:bid/:seats",(req,res)=>{
 				QRCode.toDataURL(qrtext, function (err, url) {
 					req.body.qr64 = url;
 				})
-				user.txns=req.body;
+				user.txns.push(req.body);
 				user.save();
 				if(err){
 					console.log(err);
