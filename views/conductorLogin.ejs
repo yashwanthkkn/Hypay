@@ -9,13 +9,13 @@
 				<h1 ><strong class="px-2 py-1"><i class="fab fa-galactic-senate"></i> HypaY</strong></h1>
 				<hr>
 			</div>
-			<form method="POST" action="/login">
+			<form method="POST" action="/conductorLogin">
 				<div class="form-group">
-					<label for="username" class="text-primary font-weight-bold">Mobile Number :</label>
+					<label for="username" class="text-primary font-weight-bold">Bus Number :</label>
 					<input id="username" name="username" type="text" placeholder="Number" class="form-control">
 				</div>
 				<div class="form-group">
-					<label for="password" class="text-primary font-weight-bold">Password :</label>
+					<label for="password" class="text-primary font-weight-bold">Key :</label>
 					<input id="password" name="password" type="password" placeholder="Password" class="form-control">
 				</div>
 				<p></p>
@@ -24,24 +24,8 @@
 				</div>
 				<p></p>
 				<% if(check == true){%>
-						<p>Incorrect username or password</p>
+						<p>Incorrect Bus number or Key</p>
 				<% } %>
-			</form>
-
-			<form method="GET" action="/signup">
-				<p></p>
-				<div class="text-center">
-					Dont have a account..?
-					<input type="submit" value="Sign up" class="btn btn-link ">
-				</div>
-			</form>
-			
-			<form method="GET" action="/cLogin">
-				<p></p>
-				<div class="text-center">
-					Login as a conductor..?
-					<input type="submit" value="Login" class="btn btn-link ">
-				</div>
 			</form>
 		</div>
 		<div class="col-lg-2">

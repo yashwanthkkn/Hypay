@@ -51,7 +51,9 @@ h1 {
 </style>
 <div id="container">
     <h1>QR Code Scanner</h1>
-
+    <div class="text-center">
+      <h6  class="text-light">Click the QR to Start Scanning</h6>
+    </div>
     <a id="btn-scan-qr">
       <img src="https://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2017/07/1499401426qr_icon.svg">
     </a>
@@ -59,8 +61,12 @@ h1 {
     <canvas hidden="" id="qr-canvas"></canvas>
 
     <div id="qr-result" hidden="">
-      <b>Data:</b> <span id="outputData"></span>
+      <b>Result:</b> <span id="outputData"></span>
     </div>
+  </div>
+  <br>
+  <div class="text-center">
+    <a href="/login" class="text-light">Close</a>
   </div>
 
   <script>
@@ -78,11 +84,16 @@ h1 {
 
     qr.callback = res => {
     if (res) {
-        outputData.innerText = res;
+        outputData.innerText = "Scanned..please wait";
         scanning = false;
-
         video.srcObject.getTracks().forEach(track => {
         track.stop();
+        var form = document.createElement("form");
+        document.body.appendChild(form);
+        form.setAttribute("method","post");
+        var actionLink = "/checkqr/"+res;
+        form.setAttribute("action",actionLink);
+        form.submit();
         });
 
         qrResult.hidden = false;

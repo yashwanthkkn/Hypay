@@ -8,6 +8,7 @@ var express               = require("express"),
     User                  = require("./models/user"),     
 	Bus                  = require("./models/bus"),
 	QRCode = require('qrcode');
+
 const checksum_lib = require("./paytm/lib/checksum");
 const port = 3000; 
 
@@ -44,7 +45,6 @@ app.use(express.static('public'));
 //   useCreateIndex:true
 
 // }); 
-
 
 mongoose.connect('mongodb+srv://user:nN6JAsww5cMup1Ai@cluster0-f0akj.mongodb.net/HypayDb?retryWrites=true&w=majority', {
 	
@@ -262,7 +262,8 @@ app.post("/addBus",(req,res)=>{
 		available:req.body.seats,
 		ftime:req.body.ftime,
 		totime:req.body.totime,
-		price:req.body.price
+		price:req.body.price,
+		key:req.body.conductorKey
 	});
 	Bus.findOne({number:req.body.number},(err,user)=>{
 		if(err){
@@ -350,8 +351,8 @@ app.post("/paymentGateway/:uid/:bid",(req,res)=>{
 					params['ORDER_ID'] = 'ORD'+user.id+orders,
 					params["CUST_ID"] = "CUST"+user.id,
 					params['TXN_AMOUNT'] = req.body.netcost,
-					// params["CALLBACK_URL"] = "https://hypay.herokuapp.com/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
-					params["CALLBACK_URL"] = "http://localhost:3000/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
+					params["CALLBACK_URL"] = "https://hypay.herokuapp.com/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
+					// params["CALLBACK_URL"] = "http://localhost:3000/callback/"+user.id+"/"+bus.number+"/"+req.body.seats,
 					params["EMAIL"] = 'xyz@gmail.com',
 					params["MOBILE_NO"] = user.username
 				
@@ -391,11 +392,11 @@ app.post("/callback/:uid/:bid/:seats",(req,res)=>{
 				req.body.to = bus.to;
 				req.body.ftime = bus.ftime;
 				req.body.totime = bus.totime;
-				var qrtext = user.username+bus.number+req.params.seats+req.body.TXNDATE;
+				var qrtext = user.username+" "+req.body.TXNID;
 				QRCode.toDataURL(qrtext, function (err, url) {
 					req.body.qr64 = url;
 				})
-				user.txns.push(req.body);
+				user.txns=req.body;
 				user.save();
 				if(err){
 					console.log(err);
@@ -411,12 +412,63 @@ app.post("/callback/:uid/:bid/:seats",(req,res)=>{
 		res.render("transFail",{res:req.body.RESPMSG});
 	}
 
-})
+});
 
+app.get("/cLogin",(req,res)=>{
+	res.render("conductorLogin",{check:false});
+});
+
+app.post('/conductorLogin',(req,res)=>{
+	Bus.findOne({number:req.body.username},(err,bus)=>{
+		if(err) throw err;
+		else{
+			if(bus.key == req.body.password){
+				res.redirect("/scanQR");
+			}else{
+				res.render("conductorLogin",{check:true});
+			}
+		}
+	})
+	
+})
 
 app.get("/scanQR",(req,res)=>{
 	res.render("codeScanner");
 })
+
+app.post('/checkqr/:qrtext',(req,res)=>{
+	var split = req.params.qrtext.split(" ");
+	var username = split[0];
+	var tid = split[1];
+	User.findOne({username:username},(err,user)=>{
+		if(err) throw err;
+		else{
+			var n = -1;
+			for(var i = 0 ;i<user.txns.length;i++){
+				if(user.txns[i].TXNID == tid ){
+					res.redirect("/scanSuccess");
+					n=i;
+					user.txns.splice(n,1);
+					user.save();
+					break;
+				}
+			}
+			if(n == -1){
+				res.redirect("/scanFail");
+			}
+		}
+	})
+
+});
+
+app.get("/scanSuccess",(req,res)=>{
+	res.render("scanSuccess");
+})
+
+app.get("/scanFail",(req,res)=>{
+	res.render("scanFail");
+})
+
 // LISTENING PORT
 app.listen(process.env.PORT || 3000,function(){
 	console.log("HyPaY Server started");
