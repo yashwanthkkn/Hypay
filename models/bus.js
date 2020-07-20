@@ -12,7 +12,9 @@ const BusSchema = new mongoose.Schema({
   ftime:String,
   totime:String,
   price:String,
-  key:String
+  key:String,
+  need:Number,
+  reqs:[]
 });
 
 

@@ -8,13 +8,10 @@
 	  <div class="collapse navbar-collapse" id="navbarNav">
 		<ul class="navbar-nav">
 		  <li class="nav-item active">
-			<a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+			<a class="nav-link" href="/logged">Home <span class="sr-only">(current)</span></a>
 		  </li>
 		  <li class="nav-item">
-			<a class="nav-link" href="#">About</a>
-		  </li>
-		  <li class="nav-item">
-			<a class="nav-link" href="#">Pricing</a>
+			<a class="nav-link" href="/about">About</a>
 		  </li>
 		  <li class="nav-item">
 			<a class="nav-link" href="/logout">Logout</a>
@@ -23,7 +20,7 @@
 	  </div>
 	</nav>
 	<div class="container">
-		<h2 class="text-dark">Bus List</h2><span name="<%= User.ud %>" id="ud"></span>
+		<h2 class="text-dark">Bus List</h2>
 		<% Buses.forEach((x)=>{ %>
 			<div class="card">
 			  <h5 class="card-header">Bus Number :<%= x.number %> </h5>
@@ -32,9 +29,16 @@
 				  <p class="card-text">Time : <strong> <%= x.ftime %> </strong> to <strong><%= x.totime %></strong></p>
 				  <p class="card-text">Available Seats : <strong><%= x.available %></strong> </p>
 				<p class="card-text">Price : <strong><%= x.price %></strong> </p>
-				  <form method="POST" action="/getBill/<%= User.ud%>/<%= x.number%>">
-				<button type="submit" class="btn btn-danger btn-lg rounded-pill" value="<%= x.number %>"> Book </button>
-				</form>
+				<%  if( x.available == 0 ){ %>
+					<p class="text-info">This Ride is full.But you can Request ride.We will intimate you as soon as a ride is available</p>
+					<form method="POST" action="/needRide/<%= User.ud%>/<%= x.number%>">
+						<button type="submit" class="btn btn-primary btn-lg rounded-pill" value="<%= x.number %>"> Request </button>
+					</form>
+					<% }else{ %>
+					<form method="POST" action="/getBill/<%= User.ud%>/<%= x.number%>">
+						<button type="submit" class="btn btn-danger btn-lg rounded-pill" value="<%= x.number %>"> Book </button>
+					</form>
+					<% } %>
 			  </div>
 			</div>	
 		<% }); %>

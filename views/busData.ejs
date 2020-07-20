@@ -1,0 +1,47 @@
+<%- include("partials/header"); %>
+<div >
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="#"><i class="fab fa-galactic-senate"></i><strong class="pl-2">Hypay</strong></a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+          <li class="nav-item active">
+                <a class="nav-link" href="/home">Home<span class="sr-only">(current)</span></a>
+          </li>
+		  <li class="nav-item ">
+			<a class="nav-link" href="/addBus">Add</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/updateBus">Update</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/deleteBus">Delete</a>
+		  </li> 
+		  <li class="nav-item">
+			<a class="nav-link" href="/logout">Logout</a>
+		  </li>
+		</ul>
+	  </div>
+    </nav>
+    <div class="container">
+        <div class="card mx-auto mt-4" style="width: 45rem;">
+            <div class="card-body">
+              <h5 class="card-title">Bus number : <strong><%=bus.number%></strong></h5>
+            </div>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">Total Seats : <strong><%=bus.seats%></strong></li>
+              <li class="list-group-item">Available seats : <strong><%=bus.available%></strong></li>
+              <li class="list-group-item">Travel ID : <strong><%=bus.travel_id%></strong></li>
+              <li class="list-group-item">From : <strong><%=bus.from%></strong> - To: <strong><%=bus.to%></strong></li>
+              <li class="list-group-item">Time : <strong><%=bus.ftime%></strong> - <strong><%=bus.ttime%></strong></li>
+              <li class="list-group-item">Price : <strong><%=bus.price%></strong></li>
+              <li class="list-group-item">Requests : <strong><%=bus.need%></strong></li>
+            </ul>
+            <div class="card-body">
+              <a href="/reset/<%=bus.number%>" class="card-link">Reset Seats</a>
+            </div>
+          </div>
+    </div>
+    <%- include("partials/footer"); %>

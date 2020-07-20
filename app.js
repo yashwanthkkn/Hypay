@@ -6,8 +6,63 @@ var express               = require("express"),
     LocalStrategy         = require("passport-local"),
     passportLocalMongoose = require("passport-local-mongoose"),
     User                  = require("./models/user"),     
-	Bus                  = require("./models/bus"),
+	Bus                   = require("./models/bus"),
+	Admin                 = require("./models/admin"),
 	QRCode = require('qrcode');
+
+	var AWS               = require("aws-sdk");
+const multer              = require('multer');
+const multerS3            = require('multer-s3');
+var BucketName            = "bucketforsbml";
+
+AWS.config.region = 'ap-south-1'; // Region
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: 'ap-south-1:bdc6bae3-952d-4a50-b94e-fabd18a34d9d',
+});
+
+const s3 = new AWS.S3({
+  accessKeyId: 'AKIAQKY2NO7W7UFWM6XI',
+  secretAccessKey: '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',
+  Bucket: BucketName,
+  apiVersion: '2006-03-01'
+ });
+
+ //  // Call S3 to list the buckets
+s3.listBuckets(function(err, data) {
+  if (err) {
+    console.log("Error", err);
+  } else {
+    console.log("Success", data.Buckets);
+  }
+});
+
+
+
+ const fileFilter = (req, file, cb) => {
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type, only JPEG and PNG is allowed!'), false);
+    }
+  }
+  
+  const upload = multer({
+    fileFilter,
+    storage: multerS3({
+      acl: 'public-read',
+      s3:s3,
+      bucket: BucketName,
+      contentType: multerS3.AUTO_CONTENT_TYPE,
+      metadata: function (req, file, cb) {
+        cb(null, {fieldName: 'TESTING_METADATA'});
+      },
+      key: function (req, file, cb) {
+        cb(null, Date.now().toString())
+      }
+    })
+  });
+
+
 
 const checksum_lib = require("./paytm/lib/checksum");
 const port = 3000; 
@@ -55,19 +110,6 @@ mongoose.connect('mongodb+srv://user:nN6JAsww5cMup1Ai@cluster0-f0akj.mongodb.net
 
 });
 
-// FUNCTION TO DISPALY THE ENTIRE DB
-function displayUsers(){
-
-	User.find({},function(err,res){
-		if(err){
-			console.log("Cannot display all user data");
-		}else{
-			console.log(res);
-		}
-	});
-
-}
-
 // SETTING UP THE VIEW ENGINE
 app.set("view engine","ejs");
 
@@ -99,7 +141,7 @@ app.post('/login',
   function(req, res) {
 	if(req.user){
 		if(req.body.username == 'admin12345'){
-			res.redirect("/addBus");
+			res.redirect("/home");
 		}else{
 			res.redirect("/logged");	
 		}
@@ -151,7 +193,14 @@ app.post("/register",function(req,res){
 			passport.authenticate('local')(req,res,function(){
 				if(req.user){
 					if(req.body.username == 'admin12345'){
-						res.redirect("/addBus");
+						var admin = new Admin({
+							name:req.body.username,
+							ticketsBooked:0,
+							ticketsUsed:0,
+							minFlow:30
+						})
+						admin.save();
+						res.redirect("/home");
 					}else{
 						res.redirect("/logged");	
 					}
@@ -206,6 +255,38 @@ app.post("/bookBus/:id",isLoggedIn,(req,res)=>{
 	});
 });
 
+app.post("/needRide/:uid/:bid",isLoggedIn,(req,res)=>{
+	User.findById(req.params.uid,(err,user)=>{
+		if(err) throw err;
+		else{
+			Bus.findOne({number:req.params.bid},(err,bus)=>{
+				if(err){
+					console.log(err);
+				}else{
+					// user.reqs.push({bus:bus});
+					// bus.need+=1;
+					// user.save();
+					// bus.save();
+					res.render("reqRide",{bus:bus,user:user,flag:false});
+				}
+			})
+		}
+	})
+})
+
+app.post("/putReq/:uid/:bid",upload.single("image"),(req,res)=>{
+	Bus.findOne({number:req.params.bid},(err,bus)=>{
+		if(err){
+			console.log(err);
+		}else{
+			bus.reqs.push({user:req.params.uid,reason:req.body.reason,proof:req.file.location})
+			bus.need+=1;
+			bus.save();
+			res.render("reqRide",{bus:bus,flag:true});
+		}
+	})
+})
+
 app.post("/getBill/:uid/:bid",isLoggedIn,(req,res)=>{
 	User.findById(req.params.uid,(err,user)=>{
 		if(err){
@@ -233,6 +314,21 @@ app.get("/logout",(req,res)=>{
 	res.redirect("/");
 });
 
+
+// @route GET /home
+
+app.get("/home",(req,res)=>{
+	Bus.find({},(err,buses)=>{
+		if(err) throw err;
+		else{
+			Admin.findOne({name:"admin12345"},(err,admin)=>{
+				res.render("adminHome",{buses:buses,admin:admin});
+			})
+			
+		}
+	})
+	
+})
 
 // *************
 // Add Bus to Db
@@ -263,7 +359,8 @@ app.post("/addBus",(req,res)=>{
 		ftime:req.body.ftime,
 		totime:req.body.totime,
 		price:req.body.price,
-		key:req.body.conductorKey
+		key:req.body.conductorKey,
+		need:0
 	});
 	Bus.findOne({number:req.body.number},(err,user)=>{
 		if(err){
@@ -321,6 +418,23 @@ app.post("/deleteBus",(req,res)=>{
 		}
 	});
 })
+
+app.get("/busData/:number",(req,res)=>{
+	Bus.findOne({number:req.params.number},(err,bus)=>{
+		res.render("busData",{bus:bus});
+	})
+	
+})
+
+app.get("/reset/:number",(req,res)=>{
+	Bus.findOne({number:req.params.number},(err,bus)=>{
+		bus.available = bus.seats;
+		bus.save();
+		res.render("busData",{bus:bus});
+	})
+	
+})
+
 
 // *************
 // Payment gateway
@@ -403,7 +517,12 @@ app.post("/callback/:uid/:bid/:seats",(req,res)=>{
 				}else{
 					bus.available--;
 					bus.save();
-					res.render("transSuccess",{tid:req.body.TXNID,oid:req.body.ORDERID,amt:req.body.TXNAMOUNT,tdate:req.body.TXNDATE});
+					Admin.findOne({name:"admin12345"},(err,admin)=>{
+						admin.ticketsBooked+=1;	
+						admin.save();	
+						res.render("transSuccess",{tid:req.body.TXNID,oid:req.body.ORDERID,amt:req.body.TXNAMOUNT,tdate:req.body.TXNDATE});
+					})
+					
 				}					
 			})
 		})
@@ -462,7 +581,12 @@ app.post('/checkqr/:qrtext',(req,res)=>{
 });
 
 app.get("/scanSuccess",(req,res)=>{
-	res.render("scanSuccess");
+	Admin.findOne({name:"admin12345"},(err,admin)=>{
+		admin.ticketsBooked-=1;
+		admin.ticketsUsed+=1;					
+		res.render("scanSuccess");
+	})
+	
 })
 
 app.get("/scanFail",(req,res)=>{

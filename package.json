@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -18,11 +18,14 @@
   },
   "homepage": "https://github.com/HyletCorp/ProjectHyPay#readme",
   "dependencies": {
+    "aws-sdk": "^2.715.0",
     "body-parser": "^1.19.0",
     "ejs": "^3.0.2",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "mongoose": "^5.9.9",
+    "multer": "^1.4.2",
+    "multer-s3": "^2.9.0",
     "nodemon": "^2.0.4",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
