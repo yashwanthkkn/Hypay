@@ -230,6 +230,12 @@ app.post("/mytrips/:uid",isLoggedIn,(req,res)=>{
 	})
 })
 
+app.post("/myReqs/:uid",(req,res)=>{
+	User.findById(req.params.uid,(err,user)=>{
+		res.render("myReqs",{user:user});
+	})
+})
+
 // *************
 // ABOUT ROUTE
 // *************
@@ -279,12 +285,29 @@ app.post("/putReq/:uid/:bid",upload.single("image"),(req,res)=>{
 		if(err){
 			console.log(err);
 		}else{
-			bus.reqs.push({user:req.params.uid,reason:req.body.reason,proof:req.file.location})
+			bus.reqs.push({user:req.params.uid,reason:req.body.reason,proof:req.file.location,seats:req.body.seats})
 			bus.need+=1;
 			bus.save();
 			res.render("reqRide",{bus:bus,flag:true});
 		}
 	})
+})
+
+app.get("/confirmBill/:uid/:bid/:seats",isLoggedIn,(req,res)=>{
+	User.findById(req.params.uid,(err,user)=>{
+		if(err){
+			console.log(err)
+		}else{
+			Bus.findOne({number:req.params.bid},(err,bus)=>{
+				if(err){
+					console.log(err);
+				}else{
+					res.render("billing",{User:user,Bus:bus,seats:req.params.seats,flag:true});
+				}
+			})
+		}
+	})
+	
 })
 
 app.post("/getBill/:uid/:bid",isLoggedIn,(req,res)=>{
@@ -296,7 +319,7 @@ app.post("/getBill/:uid/:bid",isLoggedIn,(req,res)=>{
 				if(err){
 					console.log(err);
 				}else{
-					res.render("billing",{User:user,Bus:bus});
+					res.render("billing",{User:user,Bus:bus,seats:0,flag:false});
 				}
 			})
 		}
@@ -326,6 +349,32 @@ app.get("/home",(req,res)=>{
 			})
 			
 		}
+	})
+	
+})
+
+app.get("/viewReq/:id",(req,res)=>{
+	Bus.findOne({number:req.params.id},(err,bus)=>{
+		res.render("viewReq",{bus:bus});	
+	})
+})
+
+app.get("/acceptReq/:uid/:bid/:seats",(req,res)=>{
+	User.findById(req.params.uid,(err,user)=>{
+		user.accepts.push({bus:req.params.bid,seats:req.params.seats});
+		user.save();
+		var temp = [];
+		Bus.findOne({number:req.params.bid},(err,bus)=>{
+			bus.reqs.forEach((x)=>{
+				if(x.user == req.params.uid && x.seats == req.params.seats){
+					temp.push(x);
+				}
+			})
+			bus.reqs = temp;
+			bus.save();
+			res.redirect("/viewReq/"+req.params.bid);
+		})
+		
 	})
 	
 })
@@ -518,7 +567,7 @@ app.post("/callback/:uid/:bid/:seats",(req,res)=>{
 					bus.available--;
 					bus.save();
 					Admin.findOne({name:"admin12345"},(err,admin)=>{
-						admin.ticketsBooked+=1;	
+						admin.ticketsBooked++;	
 						admin.save();	
 						res.render("transSuccess",{tid:req.body.TXNID,oid:req.body.ORDERID,amt:req.body.TXNAMOUNT,tdate:req.body.TXNDATE});
 					})
@@ -582,8 +631,9 @@ app.post('/checkqr/:qrtext',(req,res)=>{
 
 app.get("/scanSuccess",(req,res)=>{
 	Admin.findOne({name:"admin12345"},(err,admin)=>{
-		admin.ticketsBooked-=1;
-		admin.ticketsUsed+=1;					
+		admin.ticketsBooked--;
+		admin.ticketsUsed++;	
+		admin.save();				
 		res.render("scanSuccess");
 	})
 	

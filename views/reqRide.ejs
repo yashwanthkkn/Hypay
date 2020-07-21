@@ -23,7 +23,7 @@
 
         <%if(flag){%>
             <div class="card">
-                <div class="card-bodd">
+                <div class="card-body">
                     <div class="card-title">
                         <h3 class="text-center text-success mt-5 ">Your Request is Recorded.....!</h3>
                     </div>
@@ -37,14 +37,18 @@
                     <p class="card-text">Time : <strong> <%= bus.ftime %> </strong> to <strong><%= bus.totime %></strong></p>
                     <p class="card-text">Available Seats : <strong><%= bus.available %></strong> </p>
                   <p class="card-text">Price : <strong><%= bus.price %></strong> </p>
-                      <p class="text-info">You are Requesting for a Additional Transport. </p>
-                      <p class="text-info">Your request will be recorded and you will receive a notification once a new trasport is available</p>
+                      <p class="text-info">You are Requesting for a Emergency Transport. </p>
+                      <p class="text-info">Your request will be recorded and you will receive a notification once a your request is accepted</p>
                       <form method="POST" action="/putReq/<%= user.id%>/<%= bus.number%>" enctype="multipart/form-data">
                           
                           <div class="form-group">
                               <label for="reason" class="text-danger" >* Please specify the reason and upload a proof</label>
                               <input type="text" name="reason" id="reason" class="form-control" required>
                           </div>
+                          <div class="form-group">
+                            <label for="seats" class="text-danger" >* Please enter no. of Seats</label>
+                            <input type="text" name="seats" id="seats" class="form-control" required>
+                        </div>
                           <div class="form-group">
                               <label for="image" class="text-danger">Upload Image</label>
                           <input type="file" name="image" id="image" class="form-control" max="2" required>

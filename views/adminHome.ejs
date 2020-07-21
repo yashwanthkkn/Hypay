@@ -70,7 +70,11 @@
                             <th><%=bus.key%></th>
                             <th><%=bus.seats%></th>
                             <th><%=bus.available%></th>
-                            <th><%=bus.need%></th>
+                            <th><%=bus.need%>
+                              <%  if(bus.reqs.length!=0){%>
+                                    <a href="/viewReq/<%=bus.number%>">view</a>
+                            <%}%>
+                            </th>
                         </tr>
                     <% }) %>
                 </table>

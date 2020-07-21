@@ -1,0 +1,53 @@
+<%- include("partials/header"); %>
+<div >
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<a class="navbar-brand" href="#"><i class="fab fa-galactic-senate"></i><strong class="pl-2">Hypay</strong></a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="navbarNav">
+		<ul class="navbar-nav">
+          <li class="nav-item active">
+                <a class="nav-link" href="/home">Home<span class="sr-only">(current)</span></a>
+          </li>
+		  <li class="nav-item ">
+			<a class="nav-link" href="/addBus">Add</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/updateBus">Update</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" href="/deleteBus">Delete</a>
+		  </li> 
+		  <li class="nav-item">
+			<a class="nav-link" href="/logout">Logout</a>
+		  </li>
+		</ul>
+	  </div>
+    </nav>
+    <div class="container mt-2">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="text-primary text-center">
+                    Request Log of Bus <%=bus.number%>
+                </h3>
+               <% var i = 1;%>
+               <% bus.reqs.forEach((req)=>{%>
+                    <div class="card">
+                        <div class="card-header">
+                          Requester : <%= i++%>
+                        </div>
+                        <div class="card-body">
+                          <h5 class="card-title">Reason :</h5>
+                          <p class="card-text"><%=req.reason%></p>
+                          <p class="card-text">No. of Seats : <%=req.seats%></p>
+                          <a href="<%=req.proof%>" class="btn btn-primary">View Proof</a>
+                          <a href="/acceptReq/<%=req.user%>/<%=bus.number%>/<%=req.seats%>" class="btn btn-danger">Accpet Request</a>
+                        </div>
+                      </div>
+                      <% }) %>
+                
+            </div>
+        </div>
+    </div>
+    <%- include("partials/footer"); %>

@@ -30,7 +30,7 @@
 				  <p class="card-text">Available Seats : <strong><%= x.available %></strong> </p>
 				<p class="card-text">Price : <strong><%= x.price %></strong> </p>
 				<%  if( x.available == 0 ){ %>
-					<p class="text-info">This Ride is full.But you can Request ride.We will intimate you as soon as a ride is available</p>
+					<p class="text-info">This Ride is full.But you can Request for emergency Transport</p>
 					<form method="POST" action="/needRide/<%= User.ud%>/<%= x.number%>">
 						<button type="submit" class="btn btn-primary btn-lg rounded-pill" value="<%= x.number %>"> Request </button>
 					</form>
