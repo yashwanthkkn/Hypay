@@ -1,4 +1,5 @@
 // PACKAGES REQUIRED
+require('dotenv').config()
 var express               = require("express"),
     mongoose              = require("mongoose"),
     bodyparser            = require("body-parser"),
@@ -13,30 +14,19 @@ var express               = require("express"),
 	var AWS               = require("aws-sdk");
 const multer              = require('multer');
 const multerS3            = require('multer-s3');
-var BucketName            = "bucketforsbml";
+var BucketName            = process.env.BUCKET_NAME;
 
 AWS.config.region = 'ap-south-1'; // Region
 AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    IdentityPoolId: 'ap-south-1:bdc6bae3-952d-4a50-b94e-fabd18a34d9d',
+    IdentityPoolId: process.env.ID_POOL,
 });
 
 const s3 = new AWS.S3({
-  accessKeyId: 'AKIAQKY2NO7W7UFWM6XI',
-  secretAccessKey: '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',
+  accessKeyId: process.env.ACCESSKEY,
+  secretAccessKey: process.env.SECRETKEY,
   Bucket: BucketName,
   apiVersion: '2006-03-01'
  });
-
- //  // Call S3 to list the buckets
-s3.listBuckets(function(err, data) {
-  if (err) {
-    console.log("Error", err);
-  } else {
-    console.log("Success", data.Buckets);
-  }
-});
-
-
 
  const fileFilter = (req, file, cb) => {
     if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
@@ -74,7 +64,7 @@ var check = false;
 app.use(bodyparser.urlencoded({extented:true}));
 
 app.use(require("express-session")({
-	secret : "ThisIsNotMy Random_Salt",
+	secret : SESSION_SECRET,
 	resave : false,
 	saveUninitialized : false
 }));
@@ -89,19 +79,9 @@ passport.deserializeUser(User.deserializeUser());
 
 // TO INTIMATE EXPRESS TO LOOK IN THAT Dir()
 app.use(express.static('public'));
+const MongoURI = MONGO_URI;
 
-
-// CONNECTING THE DATABASE TO THE SERVER
-// mongoose.connect('mongodb://localhost/HypayDb', {
-	
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-//   useFindAndModify: false,
-//   useCreateIndex:true
-
-// }); 
-
-mongoose.connect('mongodb+srv://user:nN6JAsww5cMup1Ai@cluster0-f0akj.mongodb.net/HypayDb?retryWrites=true&w=majority', {
+mongoose.connect(MongoURI, {
 	
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -519,7 +499,7 @@ app.post("/paymentGateway/:uid/:bid",(req,res)=>{
 					params["EMAIL"] = 'xyz@gmail.com',
 					params["MOBILE_NO"] = user.username
 				
-					checksum_lib.genchecksum(params,"jBP8D58qRBMqBj&t",(err,checksum)=>{
+					checksum_lib.genchecksum(params,PAYTM_SEC,(err,checksum)=>{
 						let txn_url = "https://securegw-stage.paytm.in/order/process"
 				
 						let form_fields = ""
